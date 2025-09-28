@@ -4,7 +4,7 @@
 
 Минимальный таск-менеджер на **React + TypeScript + Vite** с Firebase (авторизация и Firestore).
 
-Опробовать можно по ссылке: "https://tpu-test-task.web.app/"
+Опробовать можно по ссылке: description: "Опробовать можно по ссылке: https://tpu-test-task.web.app/"
 
 ---
 
