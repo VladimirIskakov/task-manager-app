@@ -7,16 +7,7 @@ import styles from "./tasks.page.module.scss";
 import { selectAuth } from "@/entities/auth";
 import { Header } from "@/widgets/header";
 import { TaskModal } from "@/widgets/taskModal";
-import { 
-  createTask, 
-  deleteTask, 
-  fetchTasks, 
-  selectTasks, 
-  setFilter, 
-  setSearchQuery, 
-  updateTask, 
-  type TaskFormValues 
-} from "@/entities/tasks";
+import { createTask, deleteTask, fetchTasks, selectTasks, setFilter, setSearchQuery, updateTask, type TaskFormValues } from "@/entities/tasks";
 import { TaskCard } from "@/widgets/taskCard";
 
 const { Title, Paragraph } = Typography;
