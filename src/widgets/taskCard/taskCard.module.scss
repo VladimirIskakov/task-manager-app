@@ -1,0 +1,23 @@
+.task-card {
+  background-color: #fff;
+  width: 100%;
+
+  &__description {
+    text-align: left;
+    margin-bottom: 12px;
+  }
+
+  &__date {
+    display: block;
+    font-size: 12px;
+    margin-top: 8px;
+    text-align: right;
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column; 
+    gap: 4px;          
+    margin-top: 12px;
+  }
+}

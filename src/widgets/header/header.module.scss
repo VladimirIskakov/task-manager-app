@@ -1,0 +1,46 @@
+.header {
+  background-color: #fff;
+  border-bottom: 1px solid #cacaca;
+  padding: 0 30px; // уменьшили отступ для мобильных
+  box-sizing: border-box;
+  width: 100vw;
+
+
+  &__container {
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  &__logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1890ff;
+  }
+
+  &__auth {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Адаптивность для смартфонов */
+  @media (max-width: 600px) {
+    padding: 0 12px;
+
+    &__container {
+      padding: 8px 0;
+    }
+
+    &__logo {
+      font-size: 18px;
+    }
+
+    &__auth {
+      justify-content: center; /* выравниваем по центру */
+      flex-wrap: wrap; // если много кнопок, переносим
+      gap: 8px;
+    }
+  }
+}

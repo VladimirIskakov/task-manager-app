@@ -1,0 +1,35 @@
+.taskModal {
+  .ant-modal-header {
+    background-color: #f0f2f5;
+    border-bottom: 1px solid #d9d9d9;
+
+    .ant-modal-title {
+      font-weight: 600;
+      font-size: 18px;
+      color: #333;
+    }
+  }
+
+  .ant-modal-body {
+    padding: 24px 16px;
+  }
+
+  .ant-modal-footer {
+    border-top: 1px solid #d9d9d9;
+
+    .ant-btn-primary {
+      background-color: #1890ff;
+      border-color: #1890ff;
+      border-radius: 6px;
+
+      &:hover {
+        background-color: #40a9ff;
+        border-color: #40a9ff;
+      }
+    }
+
+    .ant-btn {
+      border-radius: 6px;
+    }
+  }
+}
