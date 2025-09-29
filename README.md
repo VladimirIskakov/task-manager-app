@@ -85,5 +85,6 @@ npm run preview
 | `npm run dev`     | Запуск dev-сервера с HMR          |
 | `npm run build`   | Сборка продакшн версии            |
 | `npm run preview` | Просмотр продакшн сборки локально |
+| `npm run test`    | Запуск тестов                     |
 
 ---
