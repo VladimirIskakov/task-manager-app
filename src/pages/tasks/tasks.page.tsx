@@ -1,13 +1,22 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/shared/lib";
-import { Button, Input, Select, List, Typography, Spin } from "antd";
+import { Button, Input, Select, List, Typography, Spin, notification } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
 import styles from "./tasks.page.module.scss";
 import { selectAuth } from "@/entities/auth";
 import { Header } from "@/widgets/header";
 import { TaskModal } from "@/widgets/taskModal";
-import { createTask, deleteTask, fetchTasks, selectTasks, setFilter, setSearchQuery, updateTask, type TaskFormValues } from "@/entities/tasks";
+import {
+  createTask,
+  deleteTask,
+  fetchTasks,
+  selectTasks,
+  setFilter,
+  setSearchQuery,
+  updateTask,
+  type TaskFormValues,
+} from "@/entities/tasks";
 import { TaskCard } from "@/widgets/taskCard";
 
 const { Title, Paragraph } = Typography;
@@ -16,10 +25,14 @@ const { Option } = Select;
 export const TasksPage = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector(selectAuth);
-  const { items, loading, error, filter, searchQuery } = useAppSelector(selectTasks);
+  const { items, loading, error, filter, searchQuery, loadingIds } =
+    useAppSelector(selectTasks);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<string | null>(null);
+
+  // 🔹 Подключаем notification по доке
+  const [api, contextHolder] = notification.useNotification();
 
   // Загружает задачи при наличии пользователя
   useEffect(() => {
@@ -27,6 +40,17 @@ export const TasksPage = () => {
       dispatch(fetchTasks(user.uid));
     }
   }, [dispatch, user]);
+
+  // 🔹 Отслеживаем ошибки/успехи и показываем уведомления
+  useEffect(() => {
+    if (error) {
+      api.error({
+        message: "Ошибка",
+        description: error,
+        placement: "topRight",
+      });
+    }
+  }, [error, api]);
 
   // Открывает модальное окно для создания или редактирования задачи
   const openModal = (taskId?: string) => {
@@ -39,9 +63,27 @@ export const TasksPage = () => {
     if (!user) return;
 
     if (editingTask) {
-      dispatch(updateTask({ id: editingTask, changes: values }));
+      dispatch(updateTask({ id: editingTask, changes: values }))
+        .unwrap()
+        .then(() =>
+          api.success({ message: "Задача обновлена", placement: "topRight" })
+        )
+        .catch(() =>
+          api.error({ message: "Не удалось обновить задачу", placement: "topRight" })
+        );
     } else {
-      dispatch(createTask({ ...values, userId: user.uid }));
+      dispatch(createTask({ ...values, userId: user.uid }))
+        .unwrap()
+        .then((task) =>
+          api.success({
+            message: "Задача создана",
+            description: `«${task.title}» успешно добавлена`,
+            placement: "topRight",
+          })
+        )
+        .catch(() =>
+          api.error({ message: "Не удалось создать задачу", placement: "topRight" })
+        );
     }
 
     setIsModalOpen(false);
@@ -52,13 +94,18 @@ export const TasksPage = () => {
   const filteredItems = items.filter((task) => {
     if (filter === "active" && task.completed) return false;
     if (filter === "completed" && !task.completed) return false;
-    if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    if (
+      searchQuery &&
+      !task.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
       return false;
     return true;
   });
 
   return (
     <div className={styles["tasks-page__container"]}>
+      {contextHolder}
+
       <Header />
 
       <div className={styles["tasks-page__header"]}>
@@ -105,13 +152,34 @@ export const TasksPage = () => {
           className={styles["tasks-page__list"]}
           dataSource={filteredItems}
           renderItem={(task) => (
-            <List.Item className={styles["tasks-page__list-item"]} key={task.id}>
+            <List.Item
+              className={styles["tasks-page__list-item"]}
+              key={task.id}
+            >
               <TaskCard
                 task={task}
                 onEdit={(id) => openModal(id)}
-                onDelete={(id) => dispatch(deleteTask(id))}
+                onDelete={(id) =>
+                  dispatch(deleteTask(id))
+                    .unwrap()
+                    .then(() =>
+                      api.success({ message: "Задача удалена", placement: "topRight" })
+                    )
+                    .catch(() =>
+                      api.error({ message: "Не удалось удалить задачу", placement: "topRight" })
+                    )
+                }
+                deleteLoading={loadingIds.includes(task.id)}
+                toggleLoading={loadingIds.includes(task.id)}
                 onToggleComplete={(id) =>
                   dispatch(updateTask({ id, changes: { completed: !task.completed } }))
+                    .unwrap()
+                    .then(() =>
+                      api.success({ message: "Задача обновлена", placement: "topRight" })
+                    )
+                    .catch(() =>
+                      api.error({ message: "Не удалось обновить задачу", placement: "topRight" })
+                    )
                 }
               />
             </List.Item>
@@ -122,7 +190,9 @@ export const TasksPage = () => {
       <TaskModal
         open={isModalOpen}
         initialValues={
-          editingTask ? items.find((t) => t.id === editingTask) || undefined : undefined
+          editingTask
+            ? items.find((t) => t.id === editingTask) || undefined
+            : undefined
         }
         onCancel={() => {
           setIsModalOpen(false);
